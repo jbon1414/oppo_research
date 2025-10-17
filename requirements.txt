@@ -1,0 +1,31 @@
+# Legislative Intelligence Research App Requirements
+
+# Core Web Framework
+streamlit>=1.28.0
+
+# Data Validation and Models
+pydantic>=2.0.0
+
+# AI/ML Agent Framework
+# Note: Replace with actual agents library name/source if different
+agents>=1.0.0
+
+# OpenAI Integration
+openai>=1.0.0
+
+# Async Support (usually included with Python 3.7+)
+# asyncio is built-in, no separate requirement needed
+
+# Type Hints (built-in for Python 3.9+, backport for older versions)
+typing-extensions>=4.0.0
+
+# Optional: Enhanced Development/Debugging
+# pandas>=1.5.0  # If data manipulation is needed
+# numpy>=1.21.0  # If numerical operations are needed
+
+# Optional: Testing Framework
+# pytest>=7.0.0
+# pytest-asyncio>=0.20.0
+
+# Note: Some packages like datetime, os, enum, abc are built into Python
+# and don't require separate installation
