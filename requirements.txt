@@ -6,9 +6,7 @@ streamlit>=1.28.0
 # Data Validation and Models
 pydantic>=2.0.0
 
-# AI/ML Agent Framework
-# Note: Replace with actual agents library name/source if different
-agents>=1.0.0
+openai-agents
 
 # OpenAI Integration
 openai>=1.0.0
@@ -28,4 +26,5 @@ typing-extensions>=4.0.0
 # pytest-asyncio>=0.20.0
 
 # Note: Some packages like datetime, os, enum, abc are built into Python
+
 # and don't require separate installation
