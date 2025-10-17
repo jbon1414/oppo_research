@@ -383,7 +383,7 @@ class ResearchResultConverter:
                     "date": vote.vote_date.strftime("%Y-%m-%d"),
                     "note": vote.description,
                     "resultLabel": vote.vote_result.value,
-                    "resultColor": ResearchResultConverter._vote_result_to_color(vote.vote_result, vote.policy_area)
+                    "resultColor": ResearchResultConverter._vote_result_to_color(vote.vote_result, vote.policy_area, vote.description, client_values)
                 }
                 for i, vote in enumerate(research_result.verified_votes)
             ],
@@ -403,14 +403,85 @@ class ResearchResultConverter:
         return icon_map.get(policy_area, "chart")
     
     @staticmethod
-    def _vote_result_to_color(vote_result: VoteResult, policy_area: PolicyArea) -> str:
-        """Map vote results to display colors (simplified for now)"""
-        if vote_result == VoteResult.YEA:
-            return "success"  # Green for Yea votes
-        elif vote_result == VoteResult.NAY:
-            return "danger"   # Red for Nay votes
-        else:
+    def _vote_result_to_color(vote_result: VoteResult, policy_area: PolicyArea, vote_description: str = "", client_values: ClientValues = None) -> str:
+        """Map vote results to display colors based on alignment with economic principles"""
+        if vote_result in [VoteResult.PRESENT, VoteResult.ABSENT]:
             return "warning"  # Yellow for Present/Absent
+        
+        # Use a simplified alignment check based on vote description
+        if client_values is None:
+            client_values = DEFAULT_CLIENT_VALUES
+        
+        # Determine if the bill/vote aligns with pro-market principles
+        vote_aligns = ResearchResultConverter._determine_vote_alignment(vote_description, policy_area)
+        
+        # Determine color based on alignment and vote result
+        if vote_result == VoteResult.YEA:
+            # Yea on pro-market bill = green, Yea on anti-market bill = red
+            return "success" if vote_aligns else "danger"
+        elif vote_result == VoteResult.NAY:
+            # Nay on pro-market bill = red, Nay on anti-market bill = green
+            return "danger" if vote_aligns else "success"
+        else:
+            return "warning"
+    
+    @staticmethod
+    def _determine_vote_alignment(description: str, policy_area: PolicyArea) -> bool:
+        """Simplified version of vote alignment logic"""
+        description_lower = description.lower()
+        
+        if policy_area == PolicyArea.TAX_POLICY:
+            # Pro-market: tax cuts, reductions
+            pro_market_terms = ["tax cut", "reduce tax", "tax reduction", "tax relief", "lower tax", "tax decrease"]
+            anti_market_terms = ["tax increase", "raise tax", "higher tax", "tax hike"]
+            
+            if any(term in description_lower for term in pro_market_terms):
+                return True
+            if any(term in description_lower for term in anti_market_terms):
+                return False
+                
+        elif policy_area == PolicyArea.REGULATION:
+            # Pro-market: deregulation
+            pro_market_terms = ["deregulat", "reduce regulation", "eliminate regulation", "regulatory relief"]
+            anti_market_terms = ["new regulation", "increase regulation", "expand regulation", "regulatory expansion"]
+            
+            if any(term in description_lower for term in pro_market_terms):
+                return True
+            if any(term in description_lower for term in anti_market_terms):
+                return False
+                
+        elif policy_area == PolicyArea.SPENDING:
+            # Pro-market: spending cuts
+            pro_market_terms = ["cut spending", "reduce budget", "spending reduction", "fiscal restraint"]
+            anti_market_terms = ["increase spending", "expand budget", "spending increase", "more funding"]
+            
+            if any(term in description_lower for term in pro_market_terms):
+                return True
+            if any(term in description_lower for term in anti_market_terms):
+                return False
+        
+        elif policy_area == PolicyArea.TRADE:
+            # Pro-market: free trade
+            pro_market_terms = ["free trade", "trade agreement", "reduce tariff", "eliminate tariff"]
+            anti_market_terms = ["increase tariff", "trade protection", "import restriction"]
+            
+            if any(term in description_lower for term in pro_market_terms):
+                return True
+            if any(term in description_lower for term in anti_market_terms):
+                return False
+                
+        elif policy_area == PolicyArea.LABOR_POLICY:
+            # Pro-market: reduce labor restrictions
+            pro_market_terms = ["reduce minimum wage", "labor flexibility", "right to work"]
+            anti_market_terms = ["increase minimum wage", "expand union", "worker protection"]
+            
+            if any(term in description_lower for term in pro_market_terms):
+                return True
+            if any(term in description_lower for term in anti_market_terms):
+                return False
+        
+        # Default: assume neutral/unclear alignment
+        return False
 
 
 # ============================================================================
